@@ -1,0 +1,12 @@
+{
+  "name": "blog-uploader",
+  "version": "1.0.0",
+  "description": "Simple Node.js backend that saves blog posts as JSON files (no database)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
