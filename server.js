@@ -1,18 +1,23 @@
 const express = require('express');
+const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const DATA_DIR = path.join(__dirname, 'data');
+// DATA_DIR can be overridden with an env var, useful when mounting a
+// persistent volume on Render/Railway/Fly.io at a specific path.
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 
 // Make sure the data folder exists
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
-app.use(express.json());
+// Parses multipart/form-data (text fields only, no files kept in memory/disk)
+const upload = multer();
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Turn a title into a safe filename slug
@@ -27,7 +32,8 @@ function slugify(text) {
 }
 
 // Create a new blog post -> saved as a .json file
-app.post('/api/blogs', (req, res) => {
+// Expects multipart/form-data (e.g. a FormData object from the browser)
+app.post('/api/blogs', upload.none(), (req, res) => {
   const { title, author, content } = req.body;
 
   if (!title || !content) {
